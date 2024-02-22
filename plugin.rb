@@ -17,48 +17,60 @@ class CASAuthenticator < ::Auth::Authenticator
     'cas'
   end
 
+
+
   def after_authenticate(auth_token)
     # IFAD Customization to fetch all user information automatically from People
     #
-    person = People::Client::Person.find(auth_token[:uid])
+    result = Auth::Result.new
 
     #if the email address is set in the extra attributes and we know the accessor use it here
     email = auth_token[:extra][SiteSetting.cas_sso_email] if (auth_token[:extra] && auth_token[:extra][SiteSetting.cas_sso_email])
     #if we could not get the email address from the extra attributes try to set it base on the username
     email ||= unless SiteSetting.cas_sso_email_domain.nil?
-      "#{auth_token[:uid]}@#{SiteSetting.cas_sso_email_domain}"
-    else
-      auth_token[:email] || auth_token[:uid]
-    end
+              "#{auth_token[:uid]}@#{SiteSetting.cas_sso_email_domain}"
+            else
+              auth_token[:email] || auth_token[:uid]
+            end
 
-    user =
-      User.where(username: person.account_name).first ||
-      User.new(
-        username: person.account_name,
-            name: [person.first_name, person.last_name].join(' '),
-           email: person.email,
-         website: People::Client.client.config.base_uri + '/' + person.account_name,
-           admin: false,
-          active: true,
-        approved: SiteSetting.cas_sso_user_approved
-      ).tap(&:save!)
+    result.email = email
+    result.email_valid = true
+    result.username = auth_token[:uid]
 
-    user.update_column :bio_cooked, person.bio
+    result.name = if auth_token[:extra] && auth_token[:extra][SiteSetting.cas_sso_name]
+                    auth_token[:extra][SiteSetting.cas_sso_name]
+                  else
+                    auth_token[:uid]
+                  end
+     # plugin specific data storage
+     current_info = ::PluginStore.get("cas", "cas_uid_#{result.username}")
 
-    ::PluginStore.set("cas", "cas_uid_#{user.username}", {user_id: user.id})
+    #DEBUGGING log groups data if available.  Use to understand the format of your groups data
+    Rails.logger.error  "CAS_SSO -->  Groups for user #{result.username} are #{auth_token[:extra]['Groups']}" if auth_token[:extra]['Groups']
 
-
-    Auth::Result.new.tap do |result|
-      result.email       = email
+    if SiteSetting.cas_sso_user_auto_create && User.find_by_email(email).nil?
+      user = User.create(name: result.name,
+                       email: result.email,
+                       username: result.username,
+                       approved: SiteSetting.cas_sso_user_approved)
+      ::PluginStore.set("cas", "cas_uid_#{user.username}", {user_id: user.id})
       result.email_valid = true
-
-      result.username    = user.username
-      result.name        = user.name
-      result.extra_data  = { cas_user_id: user.username }
-
-      result.user        = user
     end
 
+    result.user =
+       if current_info
+          User.where(id: current_info[:user_id]).first
+       elsif user = User.where(username: result.username).first
+          #here we get a user that has already been created but has never logged in with cas. This
+          # could happen if accounts are being pre provisionsed in an edu environment. We
+          #need to get the users and set the cas plugin information as in after_create_account
+          user.update_attribute(:approved, SiteSetting.cas_sso_user_approved)
+          ::PluginStore.set("cas", "cas_uid_#{result.username}", {user_id: user.id})
+          user
+       end
+    result.user ||= User.where(email: email).first
+
+    result
   end
 
   def after_create_account(user, auth)
