@@ -45,10 +45,7 @@ class CASAuthenticator < ::Auth::Authenticator
      # plugin specific data storage
      current_info = ::PluginStore.get("cas", "cas_uid_#{result.username}")
 
-    #DEBUGGING log groups data if available.  Use to understand the format of your groups data
-    Rails.logger.error  "CAS_SSO -->  Groups for user #{result.username} are #{auth_token[:extra]['Groups']}" if auth_token[:extra]['Groups']
-
-    if SiteSetting.cas_sso_user_auto_create && User.find_by_email(email).nil?
+     if SiteSetting.cas_sso_user_auto_create && User.find_by_email(email).nil?
       user = User.create(name: result.name,
                        email: result.email,
                        username: result.username,
