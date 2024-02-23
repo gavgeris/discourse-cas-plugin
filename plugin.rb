@@ -28,7 +28,7 @@ class CASAuthenticator < ::Auth::Authenticator
     )
 
     log("auth_token(extra): #{auth_token["extra"].to_hash}";
-    log("auth_token(extra_email): #{auth_token["extra"][[SiteSetting.cas_sso_email]].to_hash}";
+    log("auth_token(extra_email): #{auth_token["extra"][SiteSetting.cas_sso_email].to_hash}";
     log("cas_sso_email: #{SiteSetting.cas_sso_email}.to_hash}";
 
 
