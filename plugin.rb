@@ -72,6 +72,10 @@ class CASAuthenticator < ::Auth::Authenticator
     result
   end
 
+  def log(info)
+    Rails.logger.warn("CAS Plugin Debugging: #{info}")
+  end
+
   def after_create_account(user, auth)
     user.update_attribute(:approved, SiteSetting.cas_sso_user_approved)
     ::PluginStore.set("cas", "cas_uid_#{auth[:username]}", {user_id: user.id})
