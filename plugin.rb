@@ -27,16 +27,16 @@ class CASAuthenticator < ::Auth::Authenticator
       "after_authenticate response: \n\ncreds: #{auth_token["credentials"].to_hash}\nuid: #{auth_token["uid"]}\ninfo: #{auth_token["info"].to_hash}\nextra: #{auth_token["extra"].to_hash}",
     )
 
-    log("cas_sso_email: #{SiteSetting.cas_sso_email}")
+#     log("cas_sso_email: #{SiteSetting.cas_sso_email}")
 
 
     #if the email address is set in the extra attributes and we know the accessor use it here
     email = auth_token[:extra][SiteSetting.cas_sso_email] if (auth_token[:extra] && auth_token[:extra][SiteSetting.cas_sso_email])
 
-    tokenemail = auth_token[:extra][SiteSetting.cas_sso_email]
-    log("email: #{tokenemail}")
-    tokenemail = auth_token["extra"]["email"]
-    log("email2: #{tokenemail}")
+#     tokenemail = auth_token[:extra][SiteSetting.cas_sso_email]
+#     log("email: #{tokenemail}")
+#     tokenemail = auth_token["extra"]["email"]
+#     log("email2: #{tokenemail}")
 
 
     #if we could not get the email address from the extra attributes try to set it base on the username
@@ -58,14 +58,14 @@ class CASAuthenticator < ::Auth::Authenticator
      # plugin specific data storage
      current_info = ::PluginStore.get("cas", "cas_uid_#{result.username}")
 
-     if SiteSetting.cas_sso_user_auto_create && User.find_by_email(email).nil?
-      user = User.create(name: result.name,
-                       email: result.email,
-                       username: result.username,
-                       approved: SiteSetting.cas_sso_user_approved)
-      ::PluginStore.set("cas", "cas_uid_#{user.username}", {user_id: user.id})
-      result.email_valid = true
-    end
+#      if SiteSetting.cas_sso_user_auto_create && User.find_by_email(email).nil?
+#       user = User.create(name: result.name,
+#                        email: result.email,
+#                        username: result.username,
+#                        approved: SiteSetting.cas_sso_user_approved)
+#       ::PluginStore.set("cas", "cas_uid_#{user.username}", {user_id: user.id})
+#       result.email_valid = true
+#     end
 
     result.user =
        if current_info
@@ -80,7 +80,8 @@ class CASAuthenticator < ::Auth::Authenticator
        end
     result.user ||= User.where(email: email).first
 
-    result
+#     result
+  super(auth_token)
   end
 
   def log(info)
