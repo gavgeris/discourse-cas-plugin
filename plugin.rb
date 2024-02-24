@@ -27,9 +27,6 @@ class CASAuthenticator < ::Auth::Authenticator
       "after_authenticate response: \n\ncreds: #{auth_token["credentials"].to_hash}\nuid: #{auth_token["uid"]}\ninfo: #{auth_token["info"].to_hash}\nextra: #{auth_token["extra"].to_hash}",
     )
 
-    log("cas_sso_email: #{SiteSetting.cas_sso_email}")
-
-
     #if the email address is set in the extra attributes and we know the accessor use it here
     email = auth_token[:extra][SiteSetting.cas_sso_email] if (auth_token[:extra] && auth_token[:extra][SiteSetting.cas_sso_email])
 
