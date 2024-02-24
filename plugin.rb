@@ -19,7 +19,7 @@ class CASAuthenticator < ::Auth::Authenticator
 
 
 
-  def after_authenticate(auth_token)
+  def after_authenticate(auth_token,  existing_account: nil)
     # IFAD Customization to fetch all user information automatically from People
     #
     result = Auth::Result.new
@@ -81,7 +81,7 @@ class CASAuthenticator < ::Auth::Authenticator
 #     result.user ||= User.where(email: email).first
 
 #     result
-  super(auth_token)
+  super(auth_token, existing_account)
   end
 
   def log(info)
