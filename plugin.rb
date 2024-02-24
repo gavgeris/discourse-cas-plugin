@@ -75,7 +75,7 @@ class CASAuthenticator < ::Auth::Authenticator
           ::PluginStore.set("cas", "cas_uid_#{result.username}", {user_id: user.id})
           user
        end
-    result.user ||= User.where(email: email).first
+#     result.user ||= User.where(email: email).first
 
     result
   end
