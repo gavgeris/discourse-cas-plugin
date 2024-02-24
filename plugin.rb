@@ -67,18 +67,18 @@ class CASAuthenticator < ::Auth::Authenticator
 #       result.email_valid = true
 #     end
 
-    result.user =
-       if current_info
-          User.where(id: current_info[:user_id]).first
-       elsif user = User.where(username: result.username).first
-          #here we get a user that has already been created but has never logged in with cas. This
-          # could happen if accounts are being pre provisionsed in an edu environment. We
-          #need to get the users and set the cas plugin information as in after_create_account
-          user.update_attribute(:approved, SiteSetting.cas_sso_user_approved)
-          ::PluginStore.set("cas", "cas_uid_#{result.username}", {user_id: user.id})
-          user
-       end
-    result.user ||= User.where(email: email).first
+#     result.user =
+#        if current_info
+#           User.where(id: current_info[:user_id]).first
+#        elsif user = User.where(username: result.username).first
+#           #here we get a user that has already been created but has never logged in with cas. This
+#           # could happen if accounts are being pre provisionsed in an edu environment. We
+#           #need to get the users and set the cas plugin information as in after_create_account
+#           user.update_attribute(:approved, SiteSetting.cas_sso_user_approved)
+#           ::PluginStore.set("cas", "cas_uid_#{result.username}", {user_id: user.id})
+#           user
+#        end
+#     result.user ||= User.where(email: email).first
 
 #     result
   super(auth_token)
