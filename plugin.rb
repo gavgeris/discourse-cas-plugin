@@ -76,6 +76,7 @@ class CASAuthenticator < ::Auth::Authenticator
           user
        end
 #     result.user ||= User.where(email: email).first
+    result.user ||= User.find_by_email(email)
 
     result
   end
