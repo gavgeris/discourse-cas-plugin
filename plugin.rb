@@ -1,4 +1,4 @@
-# name: discourse-cas
+# name: CAS
 # about: Authenticate with discourse with CAS
 # version: 0.1.2
 # author: Erik Ordway
@@ -14,7 +14,7 @@ class CASAuthenticator < ::Auth::Authenticator
 
 
   def name
-    'discourse-cas'
+    'cas'
   end
 
   def enabled?
