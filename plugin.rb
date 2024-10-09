@@ -17,7 +17,9 @@ class CASAuthenticator < ::Auth::Authenticator
     'discourse-cas'
   end
 
-
+  def enabled?
+    true
+  end
 
   def after_authenticate(auth_token)
     # IFAD Customization to fetch all user information automatically from People
