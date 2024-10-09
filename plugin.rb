@@ -14,7 +14,7 @@ class CASAuthenticator < ::Auth::Authenticator
 
 
   def name
-    'cas'
+    'discourse-cas'
   end
 
 
