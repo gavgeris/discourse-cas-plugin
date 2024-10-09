@@ -1,4 +1,4 @@
-# name: CAS
+# name: discourse-cas
 # about: Authenticate with discourse with CAS
 # version: 0.1.2
 # author: Erik Ordway
